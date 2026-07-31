@@ -1,0 +1,11 @@
+⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3001
+    at <unknown> (Error: listen EADDRINUSE: address already in use :::3001)
+    at new Promise (<anonymous>)
+    at process._0x48609d [as emit] (c:\Users\YUVRAJ SINGH\.vscode\extensions\wallabyjs.console-ninja-1.0.537\out\buildHook\index.js:1:236889) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
