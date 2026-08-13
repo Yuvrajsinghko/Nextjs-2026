@@ -1,11 +1,61 @@
 "use client";
 
-import { React, useState } from "react";
+import { useEffect, useState } from "react";
 
 const Home = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [notes, setNotes] = useState([]);
+
+  const loadNotes = async () => {
+    try {
+      const res = await fetch("/api/notes");
+      return await res.json();
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  };
+
+  const refreshNotes = async () => {
+    const nextNotes = await loadNotes();
+    setNotes(nextNotes);
+  };
+
+  useEffect(() => {
+    let ignore = false;
+
+    loadNotes().then((nextNotes) => {
+      if (!ignore) {
+        setNotes(nextNotes);
+      }
+    });
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const handleEdit = () => {
+
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure")) return;
+
+    try {
+      const res = await fetch(`/api/notes/${id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        refreshNotes();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,7 +77,8 @@ const Home = () => {
       if (res.ok) {
         alert("Notes created successfully");
         setTitle("");
-        setTitle("");
+        setContent("");
+        refreshNotes();
       }
     } catch (error) {
       console.log(error);
@@ -78,6 +129,42 @@ const Home = () => {
               </button>
             </div>
           </form>
+        </div>
+        <div className="grid mt-5 grid-cols-1 md:grid-cols-2 gap-6">
+          {notes.length === 0 ? (
+            <p className="text-2xl text-amber-100">No notes created yet</p>
+          ) : (
+            notes.map((note) => (
+              <div
+                key={note._id}
+                className="bg-gray-900 rounded-lg shadow-md p-6 border border-gray-800"
+              >
+                <h2 className="text-xl font-semibold text-yellow-400 mb-2">
+                  {note.title}
+                </h2>
+                <p className="text-gray-300 mb-4 line-clamp-3">
+                  {note.content}
+                </p>
+                <p className="text-sm text-gray-500 mb-4">
+                  {new Date(note.createdAt).toLocaleDateString()}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(note)}
+                    className="flex-1 bg-yellow-500 text-gray-900 py-1 px-3 rounded hover:bg-yellow-600 transition text-sm font-semibold"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(note._id)}
+                    className="flex-1 bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700 transition text-sm font-semibold"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

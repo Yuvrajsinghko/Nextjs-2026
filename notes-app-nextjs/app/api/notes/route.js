@@ -8,3 +8,11 @@ export async function POST(req) {
   const note = await Note.create({ title, content });
   return Response.json(note, { status: 201 });
 }
+export async function GET(req) {
+  await connectDB();
+
+  const notes = await Note.find().sort({createdAt:-1});
+  return Response.json(notes,{status:200})
+}
+
+
