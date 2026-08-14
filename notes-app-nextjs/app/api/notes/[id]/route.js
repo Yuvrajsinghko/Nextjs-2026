@@ -11,3 +11,11 @@ export async function DELETE (req,{params}){
 
 
 }
+
+export async function PUT(req,{params}){
+    await connectDB();
+        const {id} = await params;
+    const note = await Note.findByIdAndUpdate(id,{title,content},{returnDocument:"after"});
+    return Response.json(note)
+
+}

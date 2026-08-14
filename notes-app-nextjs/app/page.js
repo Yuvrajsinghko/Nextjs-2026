@@ -7,7 +7,7 @@ const Home = () => {
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [notes, setNotes] = useState([]);
-
+  const [editingId, setEditingId] = useState(null);
   const loadNotes = async () => {
     try {
       const res = await fetch("/api/notes");
@@ -37,8 +37,10 @@ const Home = () => {
     };
   }, []);
 
-  const handleEdit = () => {
-
+  const handleEdit = (note) => {
+    setEditingId(note._id);
+    setTitle(note.title);
+    setContent(note.content);
   };
 
   const handleDelete = async (id) => {
@@ -56,6 +58,11 @@ const Home = () => {
       console.log(error);
     }
   };
+  const handleCancel = () => {
+    setEditingId("");
+    setTitle("");
+    setContent("");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,6 +73,20 @@ const Home = () => {
 
     try {
       setIsLoading(true);
+      if (editingId) {
+        const res = await fetch(`/api/notes/${editingId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (res.ok) {
+        alert("Notes updated successfully");
+        setTitle("");
+        setContent("");
+        refreshNotes();
+      }
+      }
       const res = await fetch("/api/notes", {
         method: "POST",
         headers: {
@@ -125,8 +146,20 @@ const Home = () => {
                 disabled={isLoading}
                 className="p-3 rounded-2xl bg-amber-200"
               >
-                Add Note
+                {isLoading
+                  ? "Saving.."
+                  : editingId
+                    ? "Update Note"
+                    : "Add Note"}
               </button>
+              {editingId && (
+                <button
+                  onClick={handleCancel}
+                  className=" p-4 bg-red-400 text-white rounded-lg"
+                >
+                  Cancel
+                </button>
+              )}
             </div>
           </form>
         </div>
