@@ -5,7 +5,6 @@ import React from 'react'
 
 const ShopSlug = () => {
     const params = useParams();
-    console.log(params);
     
   return (
     <div>ShopSlug</div>
